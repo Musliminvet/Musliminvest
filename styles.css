@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muslim Investment</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Deposits</a></li>
+                <li><a href="#">Withdrawals</a></li>
+                <li><a href="#">Account</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="main-content">
+        <section class="dashboard-section">
+            <h2>Dashboard</h2>
+            <div class="dashboard-stats">
+                <div class="stat">
+                    <h3>Total Balance:</h3>
+                    <p>$0.00</p>
+                </div>
+                <div class="stat">
+                    <h3>Total Deposits:</h3>
+                    <p>$0.00</p>
+                </div>
+                <div class="stat">
+                    <h3>Total Withdrawals:</h3>
+                    <p>$0.00</p>
+                </div>
+            </div>
+        </section>
+        <section class="deposit-section">
+            <h2>Deposit</h2>
+            <form id="deposit-form">
+                <label for="amount">Deposit Amount (USDT):</label>
+                <input type="number"
+
+```
+/* Global Styles */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+}
+
+/* Header Styles */
+
+.header {
+    background-color: #2E4053;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+.navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar li {
+    margin-right: 20px;
+}
+
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Main Content Styles */
+
+.main-content {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-section {
+    margin-bottom: 20px;
+}
+
+.dashboard-stats {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat {
+    margin-right: 20px;
+}
+
+.stat h3 {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.deposit-section {
+    margin-bottom: 20px;
+}
+
+.deposit-section h2 {
+    margin-bottom: 10px;
+}
+
+#deposit-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#deposit-form label {
+    margin-bottom: 10px;
+}
+
+#deposit-form input {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+}
+
+#deposit-form button {
+    background-color: #2E4053;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Footer Styles */
+
+.footer {
+    background-color: #2E4053;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+    clear: both;
+}
+
+.footer p {
+    font-size: 0.9rem;
+    margin-bottom:

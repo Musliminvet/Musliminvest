@@ -3,53 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muslim Investment</title>
+    <title>Muslim Invest</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="header">
-        <nav class="navbar">
+    <header>
+        <nav>
             <ul>
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Deposits</a></li>
-                <li><a href="#">Withdrawals</a></li>
-                <li><a href="#">Account</a></li>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Login</a></li>
+                <li><a href="#">Deposit</a></li>
+                <li><a href="#">Withdrawal</a></li>
+                <li><a href="#">Transactions</a></li>
+                <li><a href="#">Referral Link</a></li>
+                <li><a href="#">Mining Page</a></li>
+                <li><a href="#">User Account</a></li>
+                <li><a href="#">About Us</a></li>
             </ul>
         </nav>
     </header>
-    <main class="main-content">
-        <section class="dashboard-section">
-            <h2>Dashboard</h2>
-            <div class="dashboard-stats">
-                <div class="stat">
-                    <h3>Total Balance:</h3>
-                    <p>$0.00</p>
-                </div>
-                <div class="stat">
-                    <h3>Total Deposits:</h3>
-                    <p>$0.00</p>
-                </div>
-                <div class="stat">
-                    <h3>Total Withdrawals:</h3>
-                    <p>$0.00</p>
-                </div>
-            </div>
+    <main>
+        <section class="home-section">
+            <h1>Welcome to Muslim Invest</h1>
+            <p>Buy, sell, and trade cryptocurrencies with ease.</p>
+        </section>
+        <section class="login-section">
+            <h1>Login</h1>
+            <form id="login-form">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+                <button type="submit">Login</button>
+            </form>
         </section>
         <section class="deposit-section">
-            <h2>Deposit</h2>
+            <h1>Deposit</h1>
             <form id="deposit-form">
-                <label for="amount">Deposit Amount (USDT):</label>
-                <input type="number" id="amount" required>
-                <br><br>
-                <label for="wallet-address">Wallet Address:</label>
-                <input type="text" id="wallet-address" value="0xC17922B9fE08Dc675Cd2906990bEB62d17ba8A7C" readonly>
-                <br><br>
+                <label for="deposit-amount">Deposit Amount:</label>
+                <input type="number" id="deposit-amount" required>
+                <label for="deposit-method">Deposit Method:</label>
+                <select id="deposit-method">
+                    <option value="usdt">USDT (0xC17922B9fE08Dc675Cd2906990bEB62d17ba8A7C)</option>
+                    <option value="btc">BTC (bc1qg80rgcutu86vzl7pnldf0emn2da5a8m0zlc6jm)</option>
+                </select>
                 <button type="submit">Deposit</button>
             </form>
         </section>
+        <section class="withdrawal-section">
+            <h1>Withdrawal</h1>
+            <form id="withdrawal-form">
+                <label for="withdrawal-amount">Withdrawal Amount:</label>
+                <input type="number" id="withdrawal-amount" required>
+                <label for="withdrawal-method">Withdrawal Method:</label>
+                <select id="withdrawal-method">
+                    <option value="usdt">USDT</option>
+                    <option value="btc">BTC</option>
+                </select>
+                <button type="submit">Withdrawal</button>
+            </form>
+        </section>
+        <section class="transactions-section">
+            <h1>Transactions</h1>
+            <table id="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- transactions data will be displayed here -->
+                </tbody>
+            </table>
+        </section>
+        <section class="referral-section">
+            <h1>Referral Link</h1>
+            <p>Your referral link: <a href="#">https://musliminvest.com/referral/your-referral-code</a></p>
+        </section>
+        <section class="mining-section">
+            <h1>Mining Page</h1>
+            <p>Mining data will be displayed here.</p>
+        </section>
+        <section class="user-account-section">
+            <h1>User Account</h1>
+            <p>User account information will be displayed here.</p>
+        </section>
+        <section class="about-us-section">
+            <h1>About Us</h1>
+            <p>About us information will be displayed here.</p>
+        </section>
     </main>
-    <footer class="footer">
-        <p>&copy; 2023 Muslim Investment</p>
+    <footer>
+        <p>&copy; 2023 Muslim Invest</p>
     </footer>
     <script src="script.js"></script>
 </body>

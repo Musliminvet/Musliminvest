@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muslim Invest - Transactions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-left">
+                <i class="fas fa-star-and-crescent logo-icon"></i>
+                <span class="logo-text">Transactions</span>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="transactions-container">
+                <div class="transaction-filters">
+                    <button class="filter-btn active">All</button>
+                    <button class="filter-btn">Deposits</button>
+                    <button class="filter-btn">Withdrawals</button>
+                    <button class="filter-btn">Investments</button>
+                    <button class="filter-btn">Profits</button>
+                </div>
+
+                <div class="transactions-list">
+                    <div class="transaction-item">
+                        <div class="transaction-icon successful">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-main">
+                                <span class="transaction-type">Crypto Deposit</span>
+                                <span class="transaction-status successful">Successful</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-date">Dec 23, 2024 - 14:30</span>
+                                <span class="transaction-id">TXN-001234</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount successful">+$500.00</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-icon processing">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-main">
+                                <span class="transaction-type">Investment</span>
+                                <span class="transaction-status processing">Processing</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-date">Dec 22, 2024 - 16:45</span>
+                                <span class="transaction-id">TXN-001233</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount processing">-$200.00</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-icon successful">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-main">
+                                <span class="transaction-type">Daily Profit</span>
+                                <span class="transaction-status successful">Successful</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-date">Dec 22, 2024 - 09:00</span>
+                                <span class="transaction-id">TXN-001232</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount successful">+$25.50</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-icon pending">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-main">
+                                <span class="transaction-type">Withdrawal Request</span>
+                                <span class="transaction-status pending">Pending</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-date">Dec 21, 2024 - 11:20</span>
+                                <span class="transaction-id">TXN-001231</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount pending">-$150.00</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-icon action-needed">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-main">
+                                <span class="transaction-type">Crypto Deposit</span>
+                                <span class="transaction-status action-needed">Action Needed</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-date">Dec 20, 2024 - 13:15</span>
+                                <span class="transaction-id">TXN-001230</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount action-needed">+$300.00</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-icon successful">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-main">
+                                <span class="transaction-type">Referral Commission</span>
+                                <span class="transaction-status successful">Successful</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-date">Dec 20, 2024 - 10:30</span>
+                                <span class="transaction-id">TXN-001229</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount successful">+$15.00</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-icon successful">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-main">
+                                <span class="transaction-type">Investment Profit</span>
+                                <span class="transaction-status successful">Successful</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-date">Dec 19, 2024 - 09:00</span>
+                                <span class="transaction-id">TXN-001228</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount successful">+$35.75</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-icon successful">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-main">
+                                <span class="transaction-type">Bank Deposit</span>
+                                <span class="transaction-status successful">Successful</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-date">Dec 18, 2024 - 14:22</span>
+                                <span class="transaction-id">TXN-001227</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount successful">+$750.00</div>
+                    </div>
+                </div>
+
+                <div class="load-more">
+                    <button class="load-more-btn">Load More Transactions</button>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="invest.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Invest</span>
+            </a>
+            <a href="transactions.html" class="nav-item active">
+                <i class="fas fa-list"></i>
+                <span>Transactions</span>
+            </a>
+            <a href="referral.html" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Referral</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

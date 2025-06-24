@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muslim Invest - Crypto Deposit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-left">
+                <a href="deposit-options.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <span class="page-title">Crypto Deposit</span>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="deposit-details">
+                <div class="amount-section">
+                    <h3>Exact Amount to Send</h3>
+                    <div class="amount-display" id="exactAmount">
+                        <span class="crypto-amount">0.00456789</span>
+                        <span class="crypto-symbol">BTC</span>
+                    </div>
+                    <p class="usd-equivalent">≈ $100.00 USD</p>
+                </div>
+
+                <div class="qr-section">
+                    <h3>QR Code</h3>
+                    <div class="qr-placeholder">
+                        <i class="fas fa-qrcode"></i>
+                        <p>QR Code would appear here</p>
+                    </div>
+                </div>
+
+                <div class="wallet-section">
+                    <h3>Wallet Address</h3>
+                    <div class="wallet-address" id="walletAddress">
+                        <span class="address-text">bc1qg80rgcutu86vzl7pnldf0emn2da5a8m0zlc6jm</span>
+                        <button class="copy-btn" onclick="copyToClipboard('walletAddress')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="wallet-address" id="usdtAddress" style="display: none;">
+                        <span class="address-text">TA54uX5LMvdaRh2x6yxYEUJ3i7BSEsBe8p</span>
+                        <button class="copy-btn" onclick="copyToClipboard('usdtAddress')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="upload-section">
+                    <h3>Upload Payment Proof</h3>
+                    <div class="file-upload">
+                        <input type="file" id="paymentProof" accept="image/*" onchange="updateFileName()">
+                        <label for="paymentProof" class="upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span id="fileName">Choose file or drag here</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="note-section">
+                    <h3>Note (Optional)</h3>
+                    <textarea placeholder="Add any additional notes..." rows="3"></textarea>
+                </div>
+
+                <div class="deposit-summary">
+                    <h3>Deposit Summary</h3>
+                    <div class="summary-item">
+                        <span>Amount:</span>
+                        <span id="summaryAmount">$100.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Currency:</span>
+                        <span id="summaryCurrency">Bitcoin (BTC)</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Processing Time:</span>
+                        <span>1-3 confirmations</span>
+                    </div>
+                </div>
+
+                <button class="submit-deposit-btn">Submit Deposit Request</button>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="invest.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Invest</span>
+            </a>
+            <a href="transactions.html" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Transactions</span>
+            </a>
+            <a href="referral.html" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Referral</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

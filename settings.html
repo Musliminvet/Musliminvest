@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muslim Invest - Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-left">
+                <i class="fas fa-star-and-crescent logo-icon"></i>
+                <span class="logo-text">Settings</span>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="settings-container">
+                <div class="profile-section">
+                    <h3>Profile Information</h3>
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <img src="/placeholder.svg?height=80&width=80" alt="Profile Avatar" id="profileAvatar">
+                            <button class="avatar-edit-btn">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="profile-info">
+                            <div class="input-group">
+                                <label for="fullName">Full Name</label>
+                                <input type="text" id="fullName" value="Ahmed Hassan">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" value="+1 (555) 123-4567">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" value="ahmed.hassan@email.com" readonly>
+                                <small>Email cannot be changed</small>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" value="ahmed123" readonly>
+                                <small>Username cannot be changed</small>
+                            </div>
+                            
+                            <button class="update-profile-btn">Update Profile</button>
+                        </div>
+                        
+                        <button class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+
+                <div class="password-section">
+                    <h3>Update Password</h3>
+                    <div class="password-card">
+                        <div class="input-group">
+                            <label for="currentPassword">Current Password</label>
+                            <div class="password-input">
+                                <input type="password" id="currentPassword" placeholder="Enter current password">
+                                <button type="button" class="show-password" onclick="togglePassword('currentPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="newPassword">New Password</label>
+                            <div class="password-input">
+                                <input type="password" id="newPassword" placeholder="Enter new password">
+                                <button type="button" class="show-password" onclick="togglePassword('newPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <div class="password-input">
+                                <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                                <button type="button" class="show-password" onclick="togglePassword('confirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button class="update-password-btn">Update Password</button>
+                    </div>
+                </div>
+
+                <div class="security-section">
+                    <h3>Security Settings</h3>
+                    <div class="security-card">
+                        <div class="security-option">
+                            <div class="option-info">
+                                <h4>Two-Factor Authentication</h4>
+                                <p>Add an extra layer of security to your account</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="twoFactorAuth">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="security-option">
+                            <div class="option-info">
+                                <h4>Email Notifications</h4>
+                                <p>Receive email alerts for account activities</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="emailNotifications" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="security-option">
+                            <div class="option-info">
+                                <h4>Login Alerts</h4>
+                                <p>Get notified of new login attempts</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="loginAlerts" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="danger-section">
+                    <h3>Danger Zone</h3>
+                    <div class="danger-card">
+                        <div class="danger-option">
+                            <div class="option-info">
+                                <h4>Delete Account</h4>
+                                <p>Permanently delete your account and all associated data</p>
+                            </div>
+                            <button class="delete-account-btn" onclick="confirmDeleteAccount()">
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="invest.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Invest</span>
+            </a>
+            <a href="transactions.html" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Transactions</span>
+            </a>
+            <a href="referral.html" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Referral</span>
+            </a>
+            <a href="settings.html" class="nav-item active">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

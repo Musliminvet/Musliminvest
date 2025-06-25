@@ -6,7 +6,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { isBrowser } from "@/utils/browser"
+import { safeLocalStorage } from "@/lib/utils"
 
 interface DepositRequest {
   id: string
@@ -20,19 +20,26 @@ interface DepositRequest {
 export default function DepositHistoryPage() {
   const router = useRouter()
   const [deposits, setDeposits] = useState<DepositRequest[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("userLoggedIn")
-    if (!isLoggedIn) {
-      router.push("/")
-      return
+    const checkAuth = async () => {
+      if (typeof window !== "undefined") {
+        const isLoggedIn = safeLocalStorage().getItem("userLoggedIn")
+        if (!isLoggedIn) {
+          router.push("/")
+          return
+        }
+
+        const savedDeposits = safeLocalStorage().getItem("depositHistory")
+        if (savedDeposits) {
+          setDeposits(JSON.parse(savedDeposits))
+        }
+        setIsLoading(false)
+      }
     }
 
-    if (!isBrowser()) return
-    const savedDeposits = localStorage.getItem("depositHistory")
-    if (savedDeposits) {
-      setDeposits(JSON.parse(savedDeposits))
-    }
+    checkAuth()
   }, [router])
 
   const getStatusColor = (status: string) => {
@@ -44,6 +51,14 @@ export default function DepositHistoryPage() {
       default:
         return "text-yellow-400"
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <h1 className="text-2xl font-bold">Loading...</h1>
+      </div>
+    )
   }
 
   return (

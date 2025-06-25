@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import { isBrowser } from "@/utils/browser"
+import { safeLocalStorage } from "@/lib/utils"
 
 interface Investment {
   id: string
@@ -51,6 +51,7 @@ interface InvestmentContextType {
   sellInvestment: (symbol: string, quantity: number, price: number) => Promise<boolean>
   getInvestmentBySymbol: (symbol: string) => Investment | undefined
   updatePrices: () => void
+  isLoading: boolean
 }
 
 const InvestmentContext = createContext<InvestmentContextType | undefined>(undefined)
@@ -64,6 +65,7 @@ export function useInvestment() {
 }
 
 export function InvestmentProvider({ children }: { children: React.ReactNode }) {
+  const [isLoading, setIsLoading] = useState(true)
   const [investments, setInvestments] = useState<Investment[]>([
     {
       id: "1",
@@ -147,23 +149,72 @@ export function InvestmentProvider({ children }: { children: React.ReactNode }) 
 
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [balance, setBalance] = useState(() => {
-    if (isBrowser()) {
-      const isNewUser = !localStorage.getItem("hasReceivedWelcomeBonus")
-      if (isNewUser) {
-        localStorage.setItem("hasReceivedWelcomeBonus", "true")
-        return 10 // $10 welcome bonus
+  const [balance, setBalance] = useState(0)
+
+  // Initialize data from localStorage on client side
+  useEffect(() => {
+    const storage = safeLocalStorage()
+
+    // Check for welcome bonus
+    const hasReceivedWelcomeBonus = storage.getItem("hasReceivedWelcomeBonus")
+    if (!hasReceivedWelcomeBonus) {
+      storage.setItem("hasReceivedWelcomeBonus", "true")
+      setBalance(10) // $10 welcome bonus
+    } else {
+      const savedBalance = storage.getItem("userBalance")
+      setBalance(savedBalance ? Number.parseFloat(savedBalance) : 0)
+    }
+
+    // Load portfolio
+    const savedPortfolio = storage.getItem("userPortfolio")
+    if (savedPortfolio) {
+      try {
+        setPortfolio(JSON.parse(savedPortfolio))
+      } catch (error) {
+        console.error("Error loading portfolio:", error)
       }
     }
-    return 0
-  }) // Starting balance
+
+    // Load transactions
+    const savedTransactions = storage.getItem("userTransactions")
+    if (savedTransactions) {
+      try {
+        setTransactions(JSON.parse(savedTransactions))
+      } catch (error) {
+        console.error("Error loading transactions:", error)
+      }
+    }
+
+    setIsLoading(false)
+  }, [])
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    if (!isLoading) {
+      const storage = safeLocalStorage()
+      storage.setItem("userBalance", balance.toString())
+    }
+  }, [balance, isLoading])
+
+  useEffect(() => {
+    if (!isLoading) {
+      const storage = safeLocalStorage()
+      storage.setItem("userPortfolio", JSON.stringify(portfolio))
+    }
+  }, [portfolio, isLoading])
+
+  useEffect(() => {
+    if (!isLoading) {
+      const storage = safeLocalStorage()
+      storage.setItem("userTransactions", JSON.stringify(transactions))
+    }
+  }, [transactions, isLoading])
 
   // Simulate real-time price updates
   useEffect(() => {
-    if (!isBrowser()) return
     const interval = setInterval(() => {
       updatePrices()
-    }, 5000) // Update every 5 seconds
+    }, 10000) // Update every 10 seconds (less frequent for better performance)
 
     return () => clearInterval(interval)
   }, [])
@@ -171,8 +222,8 @@ export function InvestmentProvider({ children }: { children: React.ReactNode }) 
   const updatePrices = () => {
     setInvestments((prev) =>
       prev.map((investment) => {
-        // Simulate price changes (-2% to +2%)
-        const changePercent = (Math.random() - 0.5) * 4
+        // Simulate price changes (-1% to +1% for more realistic movement)
+        const changePercent = (Math.random() - 0.5) * 2
         const priceChange = investment.price * (changePercent / 100)
         const newPrice = Math.max(0.01, investment.price + priceChange)
 
@@ -193,7 +244,8 @@ export function InvestmentProvider({ children }: { children: React.ReactNode }) 
 
         const totalValue = item.quantity * currentInvestment.price
         const gainLoss = totalValue - item.quantity * item.avgPrice
-        const gainLossPercent = ((currentInvestment.price - item.avgPrice) / item.avgPrice) * 100
+        const gainLossPercent =
+          item.avgPrice > 0 ? ((currentInvestment.price - item.avgPrice) / item.avgPrice) * 100 : 0
 
         return {
           ...item,
@@ -207,133 +259,143 @@ export function InvestmentProvider({ children }: { children: React.ReactNode }) 
   }
 
   const buyInvestment = async (symbol: string, quantity: number, price: number): Promise<boolean> => {
-    const total = quantity * price
+    try {
+      const total = quantity * price
 
-    if (total > balance) {
-      return false // Insufficient funds
-    }
-
-    const investment = investments.find((inv) => inv.symbol === symbol)
-    if (!investment) return false
-
-    // Create transaction
-    const transaction: Transaction = {
-      id: Date.now().toString(),
-      type: "buy",
-      symbol,
-      name: investment.name,
-      quantity,
-      price,
-      total,
-      date: new Date().toISOString(),
-      status: "completed",
-    }
-
-    // Update balance
-    setBalance((prev) => prev - total)
-
-    // Update portfolio
-    setPortfolio((prev) => {
-      const existingItem = prev.find((item) => item.symbol === symbol)
-
-      if (existingItem) {
-        const newQuantity = existingItem.quantity + quantity
-        const newAvgPrice = (existingItem.avgPrice * existingItem.quantity + total) / newQuantity
-
-        return prev.map((item) =>
-          item.symbol === symbol
-            ? {
-                ...item,
-                quantity: newQuantity,
-                avgPrice: Number(newAvgPrice.toFixed(2)),
-                totalValue: newQuantity * price,
-                gainLoss: (price - newAvgPrice) * newQuantity,
-                gainLossPercent: ((price - newAvgPrice) / newAvgPrice) * 100,
-              }
-            : item,
-        )
-      } else {
-        const newItem: PortfolioItem = {
-          id: Date.now().toString(),
-          symbol,
-          name: investment.name,
-          quantity,
-          avgPrice: price,
-          currentPrice: price,
-          totalValue: total,
-          gainLoss: 0,
-          gainLossPercent: 0,
-        }
-        return [...prev, newItem]
+      if (total > balance) {
+        return false // Insufficient funds
       }
-    })
 
-    // Add transaction
-    setTransactions((prev) => [transaction, ...prev])
+      const investment = investments.find((inv) => inv.symbol === symbol)
+      if (!investment) return false
 
-    return true
+      // Create transaction
+      const transaction: Transaction = {
+        id: Date.now().toString(),
+        type: "buy",
+        symbol,
+        name: investment.name,
+        quantity,
+        price,
+        total,
+        date: new Date().toISOString(),
+        status: "completed",
+      }
+
+      // Update balance
+      setBalance((prev) => prev - total)
+
+      // Update portfolio
+      setPortfolio((prev) => {
+        const existingItem = prev.find((item) => item.symbol === symbol)
+
+        if (existingItem) {
+          const newQuantity = existingItem.quantity + quantity
+          const newAvgPrice = (existingItem.avgPrice * existingItem.quantity + total) / newQuantity
+
+          return prev.map((item) =>
+            item.symbol === symbol
+              ? {
+                  ...item,
+                  quantity: newQuantity,
+                  avgPrice: Number(newAvgPrice.toFixed(2)),
+                  totalValue: newQuantity * price,
+                  gainLoss: (price - newAvgPrice) * newQuantity,
+                  gainLossPercent: ((price - newAvgPrice) / newAvgPrice) * 100,
+                }
+              : item,
+          )
+        } else {
+          const newItem: PortfolioItem = {
+            id: Date.now().toString(),
+            symbol,
+            name: investment.name,
+            quantity,
+            avgPrice: price,
+            currentPrice: price,
+            totalValue: total,
+            gainLoss: 0,
+            gainLossPercent: 0,
+          }
+          return [...prev, newItem]
+        }
+      })
+
+      // Add transaction
+      setTransactions((prev) => [transaction, ...prev])
+
+      return true
+    } catch (error) {
+      console.error("Error buying investment:", error)
+      return false
+    }
   }
 
   const sellInvestment = async (symbol: string, quantity: number, price: number): Promise<boolean> => {
-    const portfolioItem = portfolio.find((item) => item.symbol === symbol)
+    try {
+      const portfolioItem = portfolio.find((item) => item.symbol === symbol)
 
-    if (!portfolioItem || portfolioItem.quantity < quantity) {
-      return false // Insufficient shares
-    }
+      if (!portfolioItem || portfolioItem.quantity < quantity) {
+        return false // Insufficient shares
+      }
 
-    const investment = investments.find((inv) => inv.symbol === symbol)
-    if (!investment) return false
+      const investment = investments.find((inv) => inv.symbol === symbol)
+      if (!investment) return false
 
-    const total = quantity * price
+      const total = quantity * price
 
-    // Create transaction
-    const transaction: Transaction = {
-      id: Date.now().toString(),
-      type: "sell",
-      symbol,
-      name: investment.name,
-      quantity,
-      price,
-      total,
-      date: new Date().toISOString(),
-      status: "completed",
-    }
+      // Create transaction
+      const transaction: Transaction = {
+        id: Date.now().toString(),
+        type: "sell",
+        symbol,
+        name: investment.name,
+        quantity,
+        price,
+        total,
+        date: new Date().toISOString(),
+        status: "completed",
+      }
 
-    // Update balance
-    setBalance((prev) => prev + total)
+      // Update balance
+      setBalance((prev) => prev + total)
 
-    // Update portfolio
-    setPortfolio((prev) => {
-      return prev
-        .map((item) => {
-          if (item.symbol === symbol) {
-            const newQuantity = item.quantity - quantity
+      // Update portfolio
+      setPortfolio((prev) => {
+        return prev
+          .map((item) => {
+            if (item.symbol === symbol) {
+              const newQuantity = item.quantity - quantity
 
-            if (newQuantity === 0) {
-              return null // Will be filtered out
+              if (newQuantity === 0) {
+                return null // Will be filtered out
+              }
+
+              const newTotalValue = newQuantity * price
+              const gainLoss = (price - item.avgPrice) * newQuantity
+              const gainLossPercent = item.avgPrice > 0 ? ((price - item.avgPrice) / item.avgPrice) * 100 : 0
+
+              return {
+                ...item,
+                quantity: newQuantity,
+                totalValue: Number(newTotalValue.toFixed(2)),
+                gainLoss: Number(gainLoss.toFixed(2)),
+                gainLossPercent: Number(gainLossPercent.toFixed(2)),
+              }
             }
+            return item
+          })
+          .filter(Boolean) as PortfolioItem[]
+      })
 
-            const newTotalValue = newQuantity * price
-            const gainLoss = (price - item.avgPrice) * newQuantity
-            const gainLossPercent = ((price - item.avgPrice) / item.avgPrice) * 100
+      // Add transaction
+      setTransactions((prev) => [transaction, ...prev])
 
-            return {
-              ...item,
-              quantity: newQuantity,
-              totalValue: Number(newTotalValue.toFixed(2)),
-              gainLoss: Number(gainLoss.toFixed(2)),
-              gainLossPercent: Number(gainLossPercent.toFixed(2)),
-            }
-          }
-          return item
-        })
-        .filter(Boolean) as PortfolioItem[]
-    })
-
-    // Add transaction
-    setTransactions((prev) => [transaction, ...prev])
-
-    return true
+      return true
+    } catch (error) {
+      console.error("Error selling investment:", error)
+      return false
+    }
   }
 
   const getInvestmentBySymbol = (symbol: string) => {
@@ -351,6 +413,7 @@ export function InvestmentProvider({ children }: { children: React.ReactNode }) 
         sellInvestment,
         getInvestmentBySymbol,
         updatePrices,
+        isLoading,
       }}
     >
       {children}

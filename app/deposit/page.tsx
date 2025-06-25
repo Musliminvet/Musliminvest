@@ -4,13 +4,13 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Diamond, RotateCcw, Copy, X, ChevronDown } from "lucide-react"
+import { ArrowLeft, Diamond, Copy, X, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { useInvestment } from "@/contexts/InvestmentContext"
-import { isBrowser } from "@/utils/browser"
+import { safeLocalStorage } from "@/lib/utils"
 
 type DepositStep = "select-option" | "enter-details" | "payment-confirmation"
 type PaymentMethod = "manual" | "automatic"
@@ -25,11 +25,13 @@ export default function DepositPage() {
   const [selectedCoin, setSelectedCoin] = useState<CoinType>("btc")
   const [showCoinDropdown, setShowCoinDropdown] = useState(false)
   const [paymentProof, setPaymentProof] = useState<File | null>(null)
-  const [depositAmount, setDepositAmount] = useState("")
+  const [isClient, setIsClient] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    if (!isBrowser()) return
-    const isLoggedIn = localStorage.getItem("userLoggedIn")
+    setIsClient(true)
+    const storage = safeLocalStorage()
+    const isLoggedIn = storage.getItem("userLoggedIn")
     if (!isLoggedIn) {
       router.push("/")
     }
@@ -51,34 +53,127 @@ export default function DepositPage() {
   }
 
   const handleContinue = () => {
-    if (!amount || Number(amount) <= 0) {
-      alert("Please enter a valid amount")
+    setError("")
+    const numAmount = Number(amount)
+
+    if (!amount || numAmount <= 0) {
+      setError("Please enter a valid amount")
       return
     }
+
+    if (numAmount < 10) {
+      setError("Minimum deposit amount is $10")
+      return
+    }
+
+    if (numAmount > 10000) {
+      setError("Maximum deposit amount is $10,000")
+      return
+    }
+
     setStep("payment-confirmation")
   }
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    alert("Copied to clipboard!")
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      alert("Copied to clipboard!")
+    } catch (error) {
+      console.error("Failed to copy:", error)
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea")
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textArea)
+      alert("Copied to clipboard!")
+    }
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload an image file")
+        return
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size must be less than 5MB")
+        return
+      }
+
       setPaymentProof(file)
+      setError("")
     }
   }
 
   const calculateCryptoAmount = () => {
     const usdAmount = Number(amount)
     if (selectedCoin === "btc") {
-      // Simulate BTC price calculation (example: $50 = 0.00047746 BTC)
-      return (usdAmount / 105000).toFixed(8) // Assuming BTC price ~$105,000
+      // Simulate BTC price calculation
+      return (usdAmount / 105000).toFixed(8)
     } else {
       // USDT is 1:1 with USD
       return usdAmount.toFixed(2)
     }
+  }
+
+  const handleSubmitDeposit = () => {
+    if (!paymentProof) {
+      setError("Please upload payment proof")
+      return
+    }
+
+    try {
+      const storage = safeLocalStorage()
+      const depositRequest = {
+        id: Date.now().toString(),
+        amount,
+        coin: selectedCoin,
+        status: "pending",
+        createdAt: new Date().toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        }),
+        walletAddress: walletAddresses[selectedCoin],
+        paymentProof: paymentProof.name,
+      }
+
+      // Save deposit request
+      const existingDeposits = storage.getItem("depositHistory")
+      const deposits = existingDeposits ? JSON.parse(existingDeposits) : []
+      deposits.unshift(depositRequest)
+      storage.setItem("depositHistory", JSON.stringify(deposits))
+
+      alert(
+        "Deposit request submitted successfully! We'll verify your payment and update your balance within 24 hours.",
+      )
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("Error submitting deposit:", error)
+      setError("Failed to submit deposit request. Please try again.")
+    }
+  }
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-2xl animate-pulse">💰</div>
+          </div>
+          <p className="text-gray-400">Loading deposit page...</p>
+        </div>
+      </div>
+    )
   }
 
   if (step === "select-option") {
@@ -97,8 +192,9 @@ export default function DepositPage() {
             variant="ghost"
             size="icon"
             className="border border-orange-500 text-orange-500 hover:bg-orange-500/10 rounded-lg"
+            onClick={() => router.push("/dashboard")}
           >
-            <RotateCcw size={20} />
+            <ArrowLeft size={20} />
           </Button>
         </header>
 
@@ -174,11 +270,15 @@ export default function DepositPage() {
                 <Input
                   id="amount"
                   type="number"
+                  min="10"
+                  max="10000"
+                  step="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter amount to deposit"
                   className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-orange-500"
                 />
+                <p className="text-xs text-gray-400 mt-1">Minimum: $10, Maximum: $10,000</p>
               </div>
 
               {/* Coin Selection */}
@@ -211,6 +311,12 @@ export default function DepositPage() {
                   )}
                 </div>
               </div>
+
+              {error && (
+                <div className="bg-red-900/20 border border-red-600/30 rounded-lg p-3">
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
 
               {/* Continue Button */}
               <Button
@@ -328,19 +434,14 @@ export default function DepositPage() {
             </span>
           </div>
 
+          {error && (
+            <div className="bg-red-900/20 border border-red-600/30 rounded-lg p-3 mb-4">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+
           {/* Submit Button */}
-          <Button
-            onClick={() => {
-              if (!paymentProof) {
-                alert("Please upload payment proof")
-                return
-              }
-              if (!isBrowser()) return
-              alert("Deposit request submitted! We'll verify your payment and update your balance within 24 hours.")
-              router.push("/dashboard")
-            }}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3"
-          >
+          <Button onClick={handleSubmitDeposit} className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3">
             Submit Deposit Request
           </Button>
         </div>

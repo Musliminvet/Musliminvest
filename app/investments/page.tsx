@@ -9,18 +9,25 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useInvestment } from "@/contexts/InvestmentContext"
+import { safeLocalStorage } from "@/lib/utils"
 
 export default function InvestmentsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const { investments } = useInvestment()
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("userLoggedIn")
-    if (!isLoggedIn) {
-      router.push("/")
+    const checkLogin = async () => {
+      const isLoggedIn = safeLocalStorage().getItem("userLoggedIn")
+      if (!isLoggedIn) {
+        router.push("/")
+      }
+      setIsLoading(false)
     }
+
+    checkLogin()
   }, [router])
 
   const categories = [
@@ -38,6 +45,14 @@ export default function InvestmentsPage() {
     const matchesCategory = selectedCategory === "all" || investment.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">

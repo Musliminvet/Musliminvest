@@ -1,30 +1,45 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { safeLocalStorage } from "@/lib/utils"
 
 export default function SettingsPage() {
   const router = useRouter()
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("userLoggedIn")
+    setIsClient(true)
+    const storage = safeLocalStorage()
+    const isLoggedIn = storage.getItem("userLoggedIn")
     if (!isLoggedIn) {
       router.push("/")
     }
   }, [router])
 
   const handleLogout = () => {
-    if (!isBrowser()) return
-    localStorage.clear()
-    router.push("/")
+    if (confirm("Are you sure you want to logout?")) {
+      const storage = safeLocalStorage()
+      storage.clear()
+      router.push("/")
+    }
   }
 
-  function isBrowser() {
-    return typeof window !== "undefined"
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-2xl animate-pulse">⚙️</div>
+          </div>
+          <p className="text-gray-400">Loading settings...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

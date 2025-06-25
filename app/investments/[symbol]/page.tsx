@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useInvestment } from "@/contexts/InvestmentContext"
 import { BuySellModal } from "@/components/BuySellModal"
+import { safeLocalStorage } from "@/lib/utils"
 
 export default function InvestmentDetailPage() {
   const params = useParams()
@@ -17,16 +18,29 @@ export default function InvestmentDetailPage() {
   const { getInvestmentBySymbol, portfolio } = useInvestment()
   const [showBuyModal, setShowBuyModal] = useState(false)
   const [showSellModal, setShowSellModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const investment = getInvestmentBySymbol(symbol)
   const portfolioItem = portfolio.find((item) => item.symbol === symbol)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("userLoggedIn")
+    const isLoggedIn = safeLocalStorage().getItem("userLoggedIn")
     if (!isLoggedIn) {
       router.push("/")
+    } else {
+      setIsLoading(false)
     }
   }, [router])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+        </div>
+      </div>
+    )
+  }
 
   if (!investment) {
     return (

@@ -10,31 +10,54 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { safeLocalStorage } from "@/lib/utils"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
     setIsLoading(true)
 
-    // Simulate login process
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      // Basic validation
+      if (!email || !password) {
+        setError("Please fill in all fields")
+        setIsLoading(false)
+        return
+      }
 
-    // Store user session (in a real app, you'd validate credentials)
-    localStorage.setItem("userLoggedIn", "true")
-    localStorage.setItem("userEmail", email)
+      if (password.length < 6) {
+        setError("Password must be at least 6 characters")
+        setIsLoading(false)
+        return
+      }
 
-    setIsLoading(false)
-    router.push("/dashboard")
+      // Simulate login process
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // Store user session
+      const storage = safeLocalStorage()
+      storage.setItem("userLoggedIn", "true")
+      storage.setItem("userEmail", email)
+
+      setIsLoading(false)
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("Login error:", error)
+      setError("Login failed. Please try again.")
+      setIsLoading(false)
+    }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-black">
       <div className="w-full max-w-md">
         <div className="bg-gray-800 rounded-2xl p-8 shadow-2xl">
           {/* Logo and Title */}
@@ -60,7 +83,9 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-2 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
+                placeholder="Enter your email"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -75,12 +100,15 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-yellow-400 pr-10"
+                  placeholder="Enter your password"
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -94,6 +122,7 @@ export default function LoginPage() {
                   checked={showPassword}
                   onCheckedChange={setShowPassword}
                   className="border-gray-600 data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400"
+                  disabled={isLoading}
                 />
                 <Label htmlFor="showPassword" className="text-white text-sm">
                   Show Password
@@ -103,6 +132,12 @@ export default function LoginPage() {
                 Forgot Password?
               </Link>
             </div>
+
+            {error && (
+              <div className="bg-red-900/20 border border-red-600/30 rounded-lg p-3">
+                <p className="text-red-400 text-sm">{error}</p>
+              </div>
+            )}
 
             <Button
               type="submit"

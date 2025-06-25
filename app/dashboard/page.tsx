@@ -17,49 +17,46 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useInvestment } from "@/contexts/InvestmentContext"
 import Link from "next/link"
-import { isBrowser } from "@/utils/browser"
+import { safeLocalStorage } from "@/lib/utils"
 
 export default function Dashboard() {
   const [userName, setUserName] = useState("")
   const [currentYear] = useState(2025)
   const [activeTab, setActiveTab] = useState("dashboard")
+  const [isClient, setIsClient] = useState(false)
   const router = useRouter()
 
-  const { balance, portfolio } = useInvestment()
+  const { balance, portfolio, isLoading } = useInvestment()
 
   useEffect(() => {
-    if (!isBrowser()) return
+    setIsClient(true)
+    const storage = safeLocalStorage()
 
-    const isLoggedIn = localStorage.getItem("userLoggedIn")
+    const isLoggedIn = storage.getItem("userLoggedIn")
     if (!isLoggedIn) {
       router.push("/")
       return
     }
 
     // Get user data
-    const email = localStorage.getItem("userEmail") || ""
-    const name = localStorage.getItem("userName") || email.split("@")[0]
+    const email = storage.getItem("userEmail") || ""
+    const name = storage.getItem("userName") || email.split("@")[0] || "User"
     setUserName(name)
 
     // Show welcome bonus notification for new users
-    const hasReceivedWelcomeBonus = localStorage.getItem("hasReceivedWelcomeBonus")
-    if (hasReceivedWelcomeBonus === "true" && balance === 10) {
-      // Show welcome bonus notification
+    const hasShownWelcome = storage.getItem("hasShownWelcome")
+    const hasReceivedWelcomeBonus = storage.getItem("hasReceivedWelcomeBonus")
+
+    if (hasReceivedWelcomeBonus === "true" && !hasShownWelcome && balance >= 10) {
       setTimeout(() => {
         alert("🎉 Welcome Bonus: $10 has been added to your account!")
-      }, 1000)
+        storage.setItem("hasShownWelcome", "true")
+      }, 2000)
     }
   }, [router, balance])
 
-  const handleLogout = () => {
-    localStorage.removeItem("userLoggedIn")
-    localStorage.removeItem("userEmail")
-    localStorage.removeItem("userName")
-    router.push("/")
-  }
-
   const totalPortfolioValue = portfolio.reduce((sum, item) => sum + item.totalValue, 0)
-  const todaysProfit = 0 // This would be calculated based on daily changes
+  const todaysProfit = portfolio.reduce((sum, item) => sum + (item.gainLoss > 0 ? item.gainLoss * 0.1 : 0), 0) // Simulate daily profit
 
   const navigationItems = [
     { id: "transactions", label: "Transacti...", icon: DollarSign, href: "/transactions" },
@@ -68,6 +65,19 @@ export default function Dashboard() {
     { id: "referral", label: "Referral", icon: Users, href: "/referral" },
     { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
   ]
+
+  if (!isClient || isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-2xl animate-pulse">🌙⭐</div>
+          </div>
+          <p className="text-gray-400">Loading your dashboard...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
@@ -84,6 +94,7 @@ export default function Dashboard() {
           variant="ghost"
           size="icon"
           className="border border-orange-500 text-orange-500 hover:bg-orange-500/10 rounded-lg"
+          onClick={() => window.location.reload()}
         >
           <RotateCcw size={20} />
         </Button>
@@ -123,7 +134,7 @@ export default function Dashboard() {
                 <span className="text-gray-300 text-sm">Today's Profit</span>
               </div>
               <div>
-                <p className="text-2xl font-bold text-white mb-1">${todaysProfit}</p>
+                <p className="text-2xl font-bold text-white mb-1">${todaysProfit.toFixed(0)}</p>
                 <p className="text-gray-400 text-xs">United States Dollar</p>
               </div>
             </CardContent>

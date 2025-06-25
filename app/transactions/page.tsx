@@ -1,23 +1,41 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useInvestment } from "@/contexts/InvestmentContext"
+import { safeLocalStorage } from "@/lib/utils"
 
 export default function TransactionsPage() {
   const router = useRouter()
   const { transactions } = useInvestment()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("userLoggedIn")
-    if (!isLoggedIn) {
-      router.push("/")
+    const checkAuth = async () => {
+      // Simulate a loading delay
+      await new Promise((resolve) => setTimeout(resolve, 200))
+
+      const isLoggedIn = safeLocalStorage.getItem("userLoggedIn")
+      if (!isLoggedIn) {
+        router.push("/")
+      }
+      setLoading(false)
     }
+
+    checkAuth()
   }, [router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <h1 className="text-4xl font-bold">Loading Transactions...</h1>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">

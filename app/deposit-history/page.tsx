@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { isBrowser } from "@/utils/browser"
 
 interface DepositRequest {
   id: string
@@ -27,7 +28,7 @@ export default function DepositHistoryPage() {
       return
     }
 
-    // Load deposit history from localStorage
+    if (!isBrowser()) return
     const savedDeposits = localStorage.getItem("depositHistory")
     if (savedDeposits) {
       setDeposits(JSON.parse(savedDeposits))

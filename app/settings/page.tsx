@@ -18,11 +18,13 @@ export default function SettingsPage() {
   }, [router])
 
   const handleLogout = () => {
-    localStorage.removeItem("userLoggedIn")
-    localStorage.removeItem("userEmail")
-    localStorage.removeItem("userName")
-    localStorage.removeItem("hasReceivedWelcomeBonus")
+    if (!isBrowser()) return
+    localStorage.clear()
     router.push("/")
+  }
+
+  function isBrowser() {
+    return typeof window !== "undefined"
   }
 
   return (

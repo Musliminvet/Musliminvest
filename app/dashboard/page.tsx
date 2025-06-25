@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useInvestment } from "@/contexts/InvestmentContext"
 import Link from "next/link"
+import { isBrowser } from "@/utils/browser"
 
 export default function Dashboard() {
   const [userName, setUserName] = useState("")
@@ -27,7 +28,8 @@ export default function Dashboard() {
   const { balance, portfolio } = useInvestment()
 
   useEffect(() => {
-    // Check if user is logged in
+    if (!isBrowser()) return
+
     const isLoggedIn = localStorage.getItem("userLoggedIn")
     if (!isLoggedIn) {
       router.push("/")

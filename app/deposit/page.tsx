@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { useInvestment } from "@/contexts/InvestmentContext"
+import { isBrowser } from "@/utils/browser"
 
 type DepositStep = "select-option" | "enter-details" | "payment-confirmation"
 type PaymentMethod = "manual" | "automatic"
@@ -27,6 +28,7 @@ export default function DepositPage() {
   const [depositAmount, setDepositAmount] = useState("")
 
   useEffect(() => {
+    if (!isBrowser()) return
     const isLoggedIn = localStorage.getItem("userLoggedIn")
     if (!isLoggedIn) {
       router.push("/")
@@ -333,6 +335,7 @@ export default function DepositPage() {
                 alert("Please upload payment proof")
                 return
               }
+              if (!isBrowser()) return
               alert("Deposit request submitted! We'll verify your payment and update your balance within 24 hours.")
               router.push("/dashboard")
             }}

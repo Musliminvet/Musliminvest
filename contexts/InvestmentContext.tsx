@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
+import { isBrowser } from "@/utils/browser"
 
 interface Investment {
   id: string
@@ -147,17 +148,19 @@ export function InvestmentProvider({ children }: { children: React.ReactNode }) 
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [balance, setBalance] = useState(() => {
-    // Check if user is new and give welcome bonus
-    const isNewUser = !localStorage.getItem("hasReceivedWelcomeBonus")
-    if (isNewUser) {
-      localStorage.setItem("hasReceivedWelcomeBonus", "true")
-      return 10 // $10 welcome bonus
+    if (isBrowser()) {
+      const isNewUser = !localStorage.getItem("hasReceivedWelcomeBonus")
+      if (isNewUser) {
+        localStorage.setItem("hasReceivedWelcomeBonus", "true")
+        return 10 // $10 welcome bonus
+      }
     }
     return 0
   }) // Starting balance
 
   // Simulate real-time price updates
   useEffect(() => {
+    if (!isBrowser()) return
     const interval = setInterval(() => {
       updatePrices()
     }, 5000) // Update every 5 seconds

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://o-musliminvest.vercel.app/sitemap.xml

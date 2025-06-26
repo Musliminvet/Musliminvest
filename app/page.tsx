@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
@@ -18,7 +17,19 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+
+    // Check if user is already logged in
+    const storage = safeLocalStorage()
+    const isLoggedIn = storage.getItem("userLoggedIn")
+    if (isLoggedIn === "true") {
+      router.push("/dashboard")
+    }
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,6 +65,17 @@ export default function LoginPage() {
       setError("Login failed. Please try again.")
       setIsLoading(false)
     }
+  }
+
+  // Don't render until mounted to prevent hydration issues
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-black">
+        <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center animate-pulse">
+          <div className="text-2xl">🌙⭐</div>
+        </div>
+      </div>
+    )
   }
 
   return (
